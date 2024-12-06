@@ -1,24 +1,31 @@
 advent_of_code::solution!(2);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let lines = input
+    let count = input
         .lines()
-        .map(|line| {
-            line.split(" ")
+        .filter(|line| {
+            let nums: Vec<u32> = line
+                .split(" ")
                 .map(|num| num.parse::<u32>().unwrap())
-                .collect::<Vec<u32>>()
+                .collect();
+
+            is_safe(&nums)
         })
-        .map(filter(|nums| {
-            let mut sorted = nums.clone();
-            sorted.sort();
-            sorted[0] + sorted[1] > sorted[2]
-        }));
+        .count();
 
-    // for line in lines {
-    //     println!("{:?}", line);
-    // }
+    Some(count as u32)
+}
 
-    None
+fn is_safe(nums: &[u32]) -> bool {
+    let is_increasing = nums.windows(2).all(|w| w[1] > w[0]);
+    let is_decreasing = nums.windows(2).all(|w| w[1] < w[0]);
+
+    let valid_adjacent = nums.windows(2).all(|w| {
+        let diff = w[1].abs_diff(w[0]);
+        diff >= 1 && diff <= 3
+    });
+
+    (is_increasing || is_decreasing) && valid_adjacent
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
