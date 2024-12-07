@@ -29,7 +29,38 @@ fn is_safe(nums: &[u32]) -> bool {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let count = input
+        .lines()
+        .filter(|line| {
+            let nums: Vec<u32> = line
+                .split(" ")
+                .map(|num| num.parse::<u32>().unwrap())
+                .collect();
+
+            // If it's already safe, no need to try removing numbers
+            if is_safe(&nums) {
+                return true;
+            }
+
+            // Try removing each number one at a time
+            for skip_idx in 0..nums.len() {
+                let filtered: Vec<u32> = nums
+                    .iter()
+                    .enumerate()
+                    .filter(|(i, _)| *i != skip_idx)
+                    .map(|(_, &n)| n)
+                    .collect();
+
+                if is_safe(&filtered) {
+                    return true;
+                }
+            }
+
+            false
+        })
+        .count();
+
+    Some(count as u32)
 }
 
 #[cfg(test)]
@@ -45,6 +76,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(4));
     }
 }
